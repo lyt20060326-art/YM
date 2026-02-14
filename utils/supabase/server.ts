@@ -1,5 +1,14 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+// 导入 Supabase 官方 Cookie 类型，替代 any，更规范
+import type { CookieOptions } from '@supabase/ssr'
+
+// 定义 cookiesToSet 的精确类型，避免 any 同时解决类型报错
+type SupabaseCookie = {
+  name: string
+  value: string
+  options: CookieOptions
+}
 
 export async function createClient() {
   const cookieStore = await cookies()
@@ -12,17 +21,16 @@ export async function createClient() {
         getAll() {
           return cookieStore.getAll()
         },
-        // 保留你要求的 any 类型，修复 forEach 解构核心错误
-        setAll(cookiesToSet: any) {
+        // 显式标注精确类型，解决 TypeScript 隐式 any 报错
+        setAll(cookiesToSet: SupabaseCookie[]) {
           try {
-            // 关键修复：forEach 回调的参数必须用 {} 解构（你之前漏了）
-            cookiesToSet?.forEach(({ name, value, options }: any) => {
+            // 空值保护 + 正确解构，避免运行时报错
+            cookiesToSet?.forEach(({ name, value, options }) => {
               cookieStore.set(name, value, options)
             })
           } catch (error) {
-            // 仅在 Server Actions/Route Handler 外报错时忽略，补充明确注释
-            // Server Components 中无法设置 Cookie，此错误属于预期情况
-            console.error('Cookie 设置失败（Server Components 中可忽略）：', error)
+            // Cloudflare Pages 环境下的友好日志
+            console.error('设置 Supabase Cookie 失败:', error)
           }
         },
       },
