@@ -8,11 +8,13 @@
     "start": "next start",
     "lint": "eslint"
   },
-  "dependencies": {
+"dependencies": {
     "next": "16.1.6",
     "openai": "^6.18.0",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.48.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -27,3 +29,4 @@
     "typescript": "^5"
   }
 }
+
